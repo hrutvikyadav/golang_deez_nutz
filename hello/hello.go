@@ -4,8 +4,10 @@ import (
 	"fmt"
 )
 
+const englishGreetPrefix = "Hello, "
+
 func Hello(name string) string {
-	return "Hello, " + name
+	return englishGreetPrefix + name
 }
 func main() {
 	fmt.Println(Hello("World"))
