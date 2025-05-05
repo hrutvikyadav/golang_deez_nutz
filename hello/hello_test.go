@@ -3,7 +3,7 @@ package main
 import "testing"
 
 
-func assertCorrectMessage(got string, want string, t *testing.T) {
+func assertCorrectMessage(got string, want string, t testing.TB) { // NOTE: this is a common pattern where helper functions accept the interface `testing.TB` so that helper functions can be called from a test OR a benchmark
 	t.Helper() // doing this will report correct stack trace on test failure
 	if got != want {
 		t.Errorf("got %q want %q", got, want)
