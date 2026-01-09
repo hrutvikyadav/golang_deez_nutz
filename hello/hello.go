@@ -10,16 +10,23 @@ const frenchGreetPrefix = "Bonjour, "
 const spanish = "spanish"
 const french = "french"
 
+func getPrefix(lang string) (prefix string) {
+	switch lang {
+	case spanish:
+		prefix = spanishGreetPrefix
+	case french:
+		prefix = frenchGreetPrefix
+	default :
+		prefix = englishGreetPrefix
+	}
+	return
+}
 func Hello(name string, lang string) string {
 	if name == "" {
 		name = "World"
 	}
-	if lang == spanish {
-		return spanishGreetPrefix + name
-	} else if lang == french {
-		return frenchGreetPrefix + name
-	}
-	return englishGreetPrefix + name
+
+	return getPrefix(lang) + name
 }
 func main() {
 	fmt.Println(Hello("World", ""))
