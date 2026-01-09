@@ -1,9 +1,13 @@
 package iteration
-import "testing"
+
+import (
+	"fmt"
+	"testing"
+)
 
 func TestRepeat (t *testing.T) {
-	got := Repeat("a")
-	want := "aaaaa"
+	got := Repeat("a", 10)
+	want := "aaaaaaaaaa"
 
 	if got != want {
 		t.Errorf("got %q, expected %q", got, want)
@@ -12,6 +16,12 @@ func TestRepeat (t *testing.T) {
 
 func BenchmarkRepeat(b *testing.B) {
 	for b.Loop() {
-		Repeat("sixnine")
+		Repeat("sixnine", 15)
 	}
+}
+
+func ExampleRepeat() {
+	repeated := Repeat("signal_", 4)
+	fmt.Println(repeated)
+	// Output: signal_signal_signal_signal_
 }
