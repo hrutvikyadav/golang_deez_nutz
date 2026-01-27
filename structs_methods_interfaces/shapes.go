@@ -25,8 +25,18 @@ func (c Circle) Area() (area float64) {
 	return
 }
 
+type Triangle struct {
+	Base float64
+	Height float64
+}
+
+func (t Triangle) Area() (area float64) {
+	area = (t.Base * t.Height) * 0.5
+	return
+}
+
 func Perimeter(shape Rectangle) (perimeter float64) {
 	perimeter = 2 * (shape.Width + shape.Height)
-	return 
+	return
 }
 
