@@ -1,7 +1,7 @@
 package main
 
 import (
-	"slices"
+	"reflect"
 	"testing"
 )
 
@@ -18,16 +18,15 @@ func TestSum(t *testing.T) {
 	})
 }
 
-// We need a new function called SumAll which will take a varying number of slices, returning a new slice containing the totals for each slice passed in.
-func TestSumAll(t *testing.T) {
+func TestSumAllTails(t *testing.T) {
 	s1 := []int{1,2,3}
 	s2 := []int{2,3,4}
 
-	got := SumAll(s1, s2)
-	want := []int{6, 9}
+	got := SumAllTails(s1, s2)
+	want := []int{5, 7}
 
 	// if got != want { WARN: slices annot be compared with `=` operator, use slices standard lib package
-	if !slices.Equal(got, want) {
+	if !reflect.DeepEqual(got, want) {
 		t.Errorf("Got: %d, want: %d", got, want)
 	}
 }
