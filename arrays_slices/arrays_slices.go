@@ -12,11 +12,10 @@ func Sum(nums []int) (int) {
 
 // INFO: variadic function to accept variable number of arguments
 func SumAll(slicesToSum ...[]int) []int {
-	lengthOfArgs := len(slicesToSum)
-	summedSlices := make([]int, lengthOfArgs)
+	var summedSlices []int
 
-	for i, numbers := range slicesToSum {
-		summedSlices[i] = Sum(numbers)
+	for _, numbers := range slicesToSum {
+		summedSlices = append(summedSlices, Sum(numbers))
 	}
 	return summedSlices
 }
