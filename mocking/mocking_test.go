@@ -2,38 +2,61 @@ package main
 
 import (
 	"bytes"
+	"reflect"
 	"testing"
 )
 
-// If we can mock time.Sleep we can use DI to use the mock instead of a "real" time.Sleep;
-// then we can spy on the calls to make assertions on them.
-// type Sleeper interface {
-// 	Sleep()
-// }
-type SpySleeper struct {
-	Calls int
+// Single mock spy for multiple dependencies
+// Captures behaviour better than prev version- writing as well as sleeping and in the right order
+type SpyCountdownOperations struct {
+	Calls []string
 }
-func (s *SpySleeper) Sleep() {
-	s.Calls++
+
+func (s *SpyCountdownOperations) Sleep() {
+	s.Calls = append(s.Calls, sleep)
 }
+
+func (s *SpyCountdownOperations) Write(p []byte) (n int, err error) {
+	s.Calls = append(s.Calls, write)
+	return
+}
+
+const write = "write"
+const sleep = "sleep"
 
 func TestCountdown(t *testing.T) {
-	buffer := &bytes.Buffer{}
-	spySleeper := &SpySleeper{Calls: 0}
+	t.Run("Print 3 to Go!", func(t *testing.T) {
+		buffer := &bytes.Buffer{}
 
-	Countdown(buffer, spySleeper)
+		Countdown(buffer, &SpyCountdownOperations{})
 
-	got := buffer.String()
-	want := `3
+		got := buffer.String()
+		want := `3
 2
 1
 Go!`
 
-	if got != want {
-		t.Errorf("got %q want %q", got, want)
-	}
+		if got != want {
+			t.Errorf("got %q want %q", got, want)
+		}
+	})
 
-	if spySleeper.Calls != 3 {
-		t.Errorf("not enough calls to Sleeper want 3 got %d", spySleeper.Calls)
-	}
+	t.Run("sleep between consequent prints", func(t *testing.T) {
+		spySleepPrinter := &SpyCountdownOperations{}
+		Countdown(spySleepPrinter, spySleepPrinter)
+
+		want := []string{
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+		}
+
+		if !reflect.DeepEqual(want, spySleepPrinter.Calls) {
+			t.Errorf("wanted calls %v got %v", want, spySleepPrinter.Calls)
+		}
+	})
 }
