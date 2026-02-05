@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
+	"log"
+	"net/http"
 )
 
 func Greet(writer io.Writer, s string) {
@@ -14,6 +15,11 @@ func Greet(writer io.Writer, s string) {
 	fmt.Fprintf(writer, "Hello, %s", s)
 }
 
+// INFO: code so general purpose even 3rd party packages can make use of it 💦
+func MyGreeterHandler(w http.ResponseWriter, r *http.Request) {
+	Greet(w, "world")
+}
+
 func main() {
-	Greet(os.Stdout, "TO OUT")
+	log.Fatal(http.ListenAndServe(":5001", http.HandlerFunc(MyGreeterHandler)))
 }
