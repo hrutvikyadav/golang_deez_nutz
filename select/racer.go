@@ -6,17 +6,18 @@ import (
 )
 
 func Racer(playerone, playertwo string) string {
-	t1 := time.Now()
-	http.Get(playerone)
-	pOneTime := time.Since(t1)
-
-	t2 := time.Now()
-	http.Get(playertwo)
-	pTwoTime := time.Since(t2)
+	pOneTime := raceWithStopWatch(playerone)
+	pTwoTime := raceWithStopWatch(playertwo)
 
 	if pOneTime < pTwoTime {
 		return playerone
 	} else {
 		return playertwo
 	}
+}
+
+func raceWithStopWatch(p string) (time.Duration) {
+	startTime := time.Now()
+	http.Get(p)
+	return time.Since(startTime)
 }
