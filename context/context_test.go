@@ -11,6 +11,7 @@ import (
 type SpyStore struct {
 	response string
 	cancelled bool
+	t *testing.T
 }
 
 // make use of context so that in case of cancellation this information can be consistently conveyed throughout the application
@@ -22,10 +23,24 @@ func (s *SpyStore) Cancel() {
 	s.cancelled = true
 }
 
+func (s *SpyStore) assertCancel() {
+	s.t.Helper()
+	if !s.cancelled {
+		s.t.Error("expected to cancel but store was not told to cancel")
+	}
+}
+
+func (s *SpyStore) assertNotCancel() {
+	s.t.Helper()
+	if s.cancelled {
+		s.t.Error("should not have cancelled")
+	}
+}
+
 func TestServer(t *testing.T) {
 	t.Run("return data from store", func(t *testing.T) {
 		data := "hello, world"
-		store := &SpyStore{data, false} // TODO: contrib upstream
+		store := &SpyStore{data, false, t} // TODO: contrib upstream
 		svr := Server(store)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -36,14 +51,12 @@ func TestServer(t *testing.T) {
 		if response.Body.String() != data {
 			t.Errorf(`got "%s", want "%s"`, response.Body.String(), data)
 		}
-		if store.cancelled {
-			t.Error("should not have cancelled")
-		}
+		store.assertNotCancel()
 	})
 
 	t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
 		data := "hello, world"
-		store := &SpyStore{response: data}
+		store := &SpyStore{ data, false, t}
 		svr := Server(store)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -55,9 +68,6 @@ func TestServer(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		svr.ServeHTTP(response, request)
-
-		if !store.cancelled {
-			t.Error("store was not told to cancel")
-		}
+		store.assertCancel()
 	})
 }
