@@ -1,6 +1,7 @@
 package racer
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,7 +20,11 @@ func TestRacer(t *testing.T) {
 		fastURL := fastServer.URL
 
 		want := fastURL
-		got, _ := Racer(slowURL, fastURL)
+		got, err := Racer(slowURL, fastURL)
+
+		if err != nil {
+			t.Fatalf("unexpected error %v", err)
+		}
 
 		if got != want {
 			t.Errorf("got %q want %q", got, want)
@@ -27,17 +32,16 @@ func TestRacer(t *testing.T) {
 	})
 
 	t.Run("return error if a server takes more than 10 seconds to respond", func(t *testing.T){
-		serverOne := makeDelayedServer(17 * time.Second)
-		serverTwo := makeDelayedServer(10 * time.Second)
+		server := makeDelayedServer(10 * time.Second)
 
-		defer serverOne.Close()
-		defer serverTwo.Close()
+		// defer server.Close() // WARN: neeed to remove this to actually make timeout work otherwise it keeps waiting to close
 
-		_, err := Racer(serverOne.URL, serverTwo.URL)
+		_, err := ConfigurableRacer(server.URL, server.URL, 2 * time.Second)
 
 		if err == nil {
 			t.Error("expected error but did not get one")
 		}
+		fmt.Printf("t: %v\n", err)
 	})
 }
 

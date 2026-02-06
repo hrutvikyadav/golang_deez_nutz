@@ -6,14 +6,20 @@ import (
 	"time"
 )
 
+const tenSecTimeOut = 10 * time.Second
+
 func Racer(playerone, playertwo string) (winner string, err error ) {
+	return ConfigurableRacer(playerone, playertwo, tenSecTimeOut)
+}
+
+func ConfigurableRacer(playerone, playertwo string, timeout time.Duration) (winner string, err error) {
 	select {
 	case <- ping(playerone):
 		return playerone, nil
 	case <- ping(playertwo):
 		return playertwo, nil
-	case <- time.After(10 * time.Second):
-		return "", fmt.Errorf("timedout afte waiting 10sec for %s, and %s", playerone, playertwo)
+	case <- time.After(timeout):
+		return "", fmt.Errorf("timedout after waiting %v for %s, and %s", timeout, playerone, playertwo)
 	}
 }
 
