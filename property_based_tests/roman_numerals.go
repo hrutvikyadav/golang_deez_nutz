@@ -53,3 +53,14 @@ func ArabicToRoman(arabic int) (roman string) {
 	// }
 	return result.String()
 }
+
+func RomanToArabic(roman string) (arabic int) {
+	arabic = 0
+	for _, rn := range rnSymbols {
+		for strings.HasPrefix(roman, rn.Symbol) {
+			arabic += rn.Value
+			roman = strings.TrimPrefix(roman, rn.Symbol)
+		}
+	}
+	return
+}
