@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/hrutvikyadav/golang_deez_nutz/blogrenderer"
+	"github.com/approvals/go-approval-tests"
+	"github.com/approvals/go-approval-tests/reporters"
+	"github.com/hrutvikyadav/blogrenderer"
 )
 
 func TestBlogRenderer(t *testing.T) {
@@ -24,13 +26,8 @@ lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ip
 			t.Error(err)
 		}
 
-		got := buf.String()
-		want := `<h1>Hello once more</h1><p>desc</p>Tags: <ul><li>sometag</li><li>othertag</li></ul>
-` // WARN:: editing the templ file in neovim will add trailing newline, causing the test to fail.
-
-		if got != want {
-			t.Errorf("got %s want %s", got, want)
-		}
+		approvals.UseReporter(reporters.NewSystemoutReporter())
+		approvals.VerifyString(t, buf.String())
 
 	})
 }
