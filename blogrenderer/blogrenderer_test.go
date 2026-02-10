@@ -25,10 +25,10 @@ lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ip
 		}
 
 		got := buf.String()
-		want := "<h1>Hello once more</h1>"
+		want := `<h1>Hello once more</h1><p>desc</p>Tags: <ul><li>sometag</li><li>othertag</li></ul>`
 
 		if got != want {
-			t.Errorf("got %q want %q", got, want)
+			t.Errorf("got %s want %s", got, want)
 		}
 
 	})
