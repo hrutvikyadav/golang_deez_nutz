@@ -2,7 +2,6 @@ package blogposts
 
 import (
 	"io/fs"
-	"testing/fstest"
 )
 
 type Post struct {
@@ -10,10 +9,13 @@ type Post struct {
 	Tags                     []string
 }
 
-func PostsFromFS(filesys fstest.MapFS) (posts []Post) {
-	dir, _ := fs.ReadDir(filesys, ".")
+func PostsFromFS(filesys fs.FS) (posts []Post, err error) {
+	dir, err := fs.ReadDir(filesys, ".")
+	if err != nil {
+		return nil, err
+	}
 	for range dir {
 		posts = append(posts, Post{})
 	}
-	return
+	return posts, nil
 }

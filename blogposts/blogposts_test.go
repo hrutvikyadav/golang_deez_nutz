@@ -1,10 +1,13 @@
 package blogposts_test
 
 import (
-	blogposts "github.com/hrutvikyadav/blogposts"
+	"errors"
+	"io/fs"
 	"testing"
 	"testing/fstest"
 	"time"
+
+	blogposts "github.com/hrutvikyadav/blogposts"
 )
 
 func TestBlogPosts(t *testing.T) {
@@ -24,10 +27,29 @@ func TestBlogPosts(t *testing.T) {
 			},
 		}
 
-		posts := blogposts.PostsFromFS(fs)
+		posts, err := blogposts.PostsFromFS(fs)
+
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		if len(posts) != len(fs) {
 			t.Errorf("expected %d posts, got %d", len(fs), len(posts))
 		}
 	})
+
+	t.Run("error in PostsFromFS returns nil posts and the error", func(t *testing.T){
+		_, err := blogposts.PostsFromFS(StubFailingFS{})
+
+		if err == nil {
+			t.Fatal("expected error but did not get one")
+		}
+		t.Log(err)
+	})
+}
+
+type StubFailingFS struct {}
+
+func (s StubFailingFS) Open(filename string) (file fs.File, err error) {
+	return nil, errors.New("oh no messed up")
 }
