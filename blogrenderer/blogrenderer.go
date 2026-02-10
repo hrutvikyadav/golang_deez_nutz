@@ -1,6 +1,7 @@
 package blogrenderer
 
 import (
+	"embed"
 	"io"
 	"text/template"
 )
@@ -12,10 +13,13 @@ type Post struct {
 	Body string
 }
 
-const postTemplate = `<h1>{{.Title}}</h1><p>{{.Description}}</p>Tags: <ul>{{range .Tags}}<li>{{.}}</li>{{end}}</ul>`
+var (
+	//go:embed "templates/*"
+	postTemplates embed.FS
+)
 
 func Convert(w io.Writer, p Post) error {
-	template, err := template.New("blog").Parse(postTemplate)
+	template, err := template.ParseFS(postTemplates, "templates/*.gohtml")
 	if err != nil {
 		return err
 	}
