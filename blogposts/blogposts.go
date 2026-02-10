@@ -2,6 +2,8 @@ package blogposts
 
 import (
 	"bufio"
+	"bytes"
+	"fmt"
 	"io"
 	"io/fs"
 	"strings"
@@ -52,6 +54,16 @@ func newPost(postMdFile io.Reader) (Post, error) {
 	title := readline()[titleOffset:]
 	desc := readline()[descOffset:]
 	tags := strings.Split(readline()[tagOffset:], ", ")
+	body := readBody(scanner)
 
-	return Post{title, desc, "", tags}, nil
+	return Post{title, desc, body , tags}, nil
+}
+func readBody(scanner *bufio.Scanner) string {
+	scanner.Scan()
+
+	buf := bytes.Buffer{}
+	for scanner.Scan() {
+		fmt.Fprintln(&buf, scanner.Text())
+	}
+	return strings.TrimSuffix(buf.String(), "\n")
 }

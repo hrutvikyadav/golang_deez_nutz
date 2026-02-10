@@ -16,13 +16,22 @@ func TestBlogPosts(t *testing.T) {
 		const (
 			firstBody = `Title: Hello
 Description: desc
-Tags: sometag, othertag`
+Tags: sometag, othertag
+---
+Body Heading
+lolololol
+Body 1`
+
 			secondBody = `Title: Foo
 Description: desc
-Tags: tagc, tagb`
+Tags: tagc, tagb
+---
+Body 2`
 			thirdBody = `Title: Holaasdjfklajdkfjakljdfjadjfa
 Description: desc
-Tags: taga, tagb`
+Tags: taga, tagb
+---
+Body 3`
 		)
 
 		fs := fstest.MapFS{
@@ -54,7 +63,10 @@ Tags: taga, tagb`
 
 		got := posts[2]
 		tags := []string{"sometag", "othertag"}
-		want := blogposts.Post{"Hello", "desc", "", tags}
+		want := blogposts.Post{"Hello", "desc", `Body Heading
+lolololol
+Body 1`,
+			tags}
 
 		assertPost(t, got, want)
 	})
