@@ -1,8 +1,10 @@
 package blogposts
 
 import (
+	"bufio"
 	"io"
 	"io/fs"
+	"strings"
 )
 
 type Post struct {
@@ -35,11 +37,21 @@ func getPost(fsys fs.FS, d string) (Post, error) {
 	return newPost(postMdFile)
 }
 func newPost(postMdFile io.Reader) (Post, error) {
-	postContent, err := io.ReadAll(postMdFile)
-	if err != nil {
-		return Post{}, err
+	const (
+		titleOffset = 7
+		descOffset = 13
+		tagOffset = 6
+	)
+	scanner := bufio.NewScanner(postMdFile)
+
+	readline := func() string {
+		scanner.Scan()
+		return scanner.Text()
 	}
 
-	tags := []string{}
-	return Post{string(postContent[7:]), "","", tags}, nil
+	title := readline()[titleOffset:]
+	desc := readline()[descOffset:]
+	tags := strings.Split(readline()[tagOffset:], ", ")
+
+	return Post{title, desc, "", tags}, nil
 }

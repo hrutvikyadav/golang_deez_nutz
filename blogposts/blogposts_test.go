@@ -13,21 +13,33 @@ import (
 
 func TestBlogPosts(t *testing.T) {
 	t.Run("read md files from fs", func(t *testing.T) {
+		const (
+			firstBody = `Title: Hello
+Description: desc
+Tags: sometag, othertag`
+			secondBody = `Title: Foo
+Description: desc
+Tags: tagc, tagb`
+			thirdBody = `Title: Holaasdjfklajdkfjakljdfjadjfa
+Description: desc
+Tags: taga, tagb`
+		)
+
 		fs := fstest.MapFS{
 			"hello world.md": {
-				Data:    []byte("Title: Hello"),
+				Data:    []byte(firstBody),
 				Mode:    0,
 				ModTime: time.Time{},
 				Sys:     nil,
 			},
 			"hello foo.md": {
-				Data:    []byte("Title: Foo"),
+				Data:    []byte(secondBody),
 				Mode:    0,
 				ModTime: time.Time{},
 				Sys:     nil,
 			},
 			"hello again.md": {
-				Data:    []byte("Title: Holaasdjfklajdkfjakljdfjadjfa"),
+				Data:    []byte(thirdBody),
 				Mode:    0,
 				ModTime: time.Time{},
 				Sys:     nil,
@@ -41,8 +53,8 @@ func TestBlogPosts(t *testing.T) {
 		}
 
 		got := posts[2]
-		tags := []string{}
-		want := blogposts.Post{"Hello", "", "", tags}
+		tags := []string{"sometag", "othertag"}
+		want := blogposts.Post{"Hello", "desc", "", tags}
 
 		assertPost(t, got, want)
 	})
