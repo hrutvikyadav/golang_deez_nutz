@@ -3,6 +3,7 @@ package blogposts_test
 import (
 	"errors"
 	"io/fs"
+	"reflect"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -14,13 +15,19 @@ func TestBlogPosts(t *testing.T) {
 	t.Run("read md files from fs", func(t *testing.T) {
 		fs := fstest.MapFS{
 			"hello world.md": {
-				Data:    []byte("hi"),
+				Data:    []byte("Title: Hello"),
+				Mode:    0,
+				ModTime: time.Time{},
+				Sys:     nil,
+			},
+			"hello foo.md": {
+				Data:    []byte("Title: Foo"),
 				Mode:    0,
 				ModTime: time.Time{},
 				Sys:     nil,
 			},
 			"hello again.md": {
-				Data:    []byte("hola"),
+				Data:    []byte("Title: Holaasdjfklajdkfjakljdfjadjfa"),
 				Mode:    0,
 				ModTime: time.Time{},
 				Sys:     nil,
@@ -33,9 +40,11 @@ func TestBlogPosts(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if len(posts) != len(fs) {
-			t.Errorf("expected %d posts, got %d", len(fs), len(posts))
-		}
+		got := posts[2]
+		tags := []string{}
+		want := blogposts.Post{"Hello", "", "", tags}
+
+		assertPost(t, got, want)
 	})
 
 	t.Run("error in PostsFromFS returns nil posts and the error", func(t *testing.T){
@@ -52,4 +61,11 @@ type StubFailingFS struct {}
 
 func (s StubFailingFS) Open(filename string) (file fs.File, err error) {
 	return nil, errors.New("oh no messed up")
+}
+
+func assertPost(t *testing.T, got blogposts.Post, want blogposts.Post) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %+v, want %+v", got, want)
+	}
 }
