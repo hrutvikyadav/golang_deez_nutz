@@ -24,7 +24,7 @@ func Convert(w io.Writer, p Post) error {
 		return err
 	}
 
-	if err := template.Execute(w, p); err != nil {
+	if err := template.ExecuteTemplate(w, "blog.gohtml", p); err != nil {
 		return err
 	}
 
