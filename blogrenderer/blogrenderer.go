@@ -18,13 +18,21 @@ var (
 	postTemplates embed.FS
 )
 
-func Convert(w io.Writer, p Post) error {
+type PostRenderer struct {
+	templ *template.Template
+}
+
+func NewPostRenderer() (*PostRenderer, error) {
 	template, err := template.ParseFS(postTemplates, "templates/*.gohtml")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if err := template.ExecuteTemplate(w, "blog.gohtml", p); err != nil {
+	return &PostRenderer{template}, nil
+}
+
+func (r *PostRenderer) Convert(w io.Writer, p Post) error {
+	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", p); err != nil {
 		return err
 	}
 
