@@ -7,16 +7,17 @@ type Transaction struct {
 }
 
 func BalanceFor(ts []Transaction, customer string) float64 {
-	var acc float64
-	for _, t := range ts {
+	calcBal := func(acc float64, t Transaction) float64 {
 		if t.From == customer {
-			acc -= t.Sum
+			return acc - t.Sum
 		}
 		if (t.To == customer) {
-			acc += t.Sum
+			return acc + t.Sum
 		}
+		return acc
 	}
-	return acc
+	bal := Reduce(ts, calcBal, 0.0)
+	return bal
 }
 
 func Sum(nums []int) (int) {
@@ -39,7 +40,7 @@ func SumAllTails(slicesToSum ...[]int) []int {
 	return res
 }
 
-func Reduce[A any](collection []A, f func(A, A) A, init A) A {
+func Reduce[A,B any](collection []A, f func(B, A) B, init B) B {
 	var res = init
 	for _, item := range collection {
 		res = f(res, item)
