@@ -1,26 +1,30 @@
 package main
 
 func Sum(nums []int) (int) {
-	sum := 0
-	for _, num := range nums {
-		sum += num
-	}
+	addF := func(acc, elem int) int { return acc + elem }
+	sum := Reduce(nums, addF, 0)
 
 	return sum
 }
 
-
-// INFO: variadic function to accept variable number of arguments
 func SumAllTails(slicesToSum ...[]int) []int {
-	var summedSlices []int
-
-	for _, numbers := range slicesToSum {
-		if len(numbers) == 0 {
-			summedSlices = append(summedSlices, 0)
+	addTail := func(acc, elem []int) []int {
+		if len(elem) == 0 {
+			return append(acc, 0)
 		} else {
-			tail := numbers[1:]
-			summedSlices = append(summedSlices, Sum(tail))
+			tail := elem[1:]
+			return append(acc, Sum(tail))
 		}
 	}
-	return summedSlices
+	res := Reduce(slicesToSum, addTail, []int{})
+	return res
+}
+
+func Reduce[A any](collection []A, f func(A, A) A, init A) A {
+	var res = init
+	for _, item := range collection {
+		res = f(res, item)
+	}
+
+	return res
 }
