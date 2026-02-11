@@ -25,6 +25,13 @@
 
 Tags: <ul><li>sometag</li><li>othertag</li></ul>
 
+<h1 id="body">Body</h1>
+
+<h2 id="some-imp">some imp</h2>
+
+<p>lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet</p>
+
+
 </main>
 <footer>
     <ul>

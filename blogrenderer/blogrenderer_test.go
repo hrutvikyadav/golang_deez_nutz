@@ -16,8 +16,8 @@ func TestBlogRenderer(t *testing.T) {
 		Description: "desc",
 		Tags: []string{ "sometag", "othertag" },
 		Body: `# Body
-		## some imp
-		lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet`,
+## some imp
+lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet`,
 	}
 
 	postRenderer, err := blogrenderer.NewPostRenderer()
