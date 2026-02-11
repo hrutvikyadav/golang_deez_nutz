@@ -1,5 +1,24 @@
 package main
 
+type Transaction struct {
+	From string
+	To string
+	Sum float64
+}
+
+func BalanceFor(ts []Transaction, customer string) float64 {
+	var acc float64
+	for _, t := range ts {
+		if t.From == customer {
+			acc -= t.Sum
+		}
+		if (t.To == customer) {
+			acc += t.Sum
+		}
+	}
+	return acc
+}
+
 func Sum(nums []int) (int) {
 	addF := func(acc, elem int) int { return acc + elem }
 	sum := Reduce(nums, addF, 0)
