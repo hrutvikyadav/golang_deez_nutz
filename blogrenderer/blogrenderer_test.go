@@ -38,6 +38,24 @@ lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ip
 		approvals.VerifyString(t, buf.String())
 
 	})
+
+	t.Run("should render index of posts", func(t *testing.T) {
+		buf := bytes.Buffer{}
+		posts := []blogrenderer.Post{{Title: "blog1"}, {Title: "blog2"}, {Title: "Blog 4"}}
+
+		err := postRenderer.RenderIndex(&buf, posts)
+		if err != nil {
+			t.Error(err)
+		}
+
+		want := `<ol><li><a href="/post/blog1">blog1</a></li><li><a href="/post/blog2">blog2</a></li><li><a href="/post/blog-4">Blog 4</a></li></ol>`
+		got := buf.String()
+
+		if got != want {
+			t.Errorf("got %q want %q", got, want)
+		}
+
+	})
 }
 
 func BenchmarkRender(b *testing.B) {

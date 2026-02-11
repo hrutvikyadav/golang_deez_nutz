@@ -3,6 +3,7 @@ package blogrenderer
 import (
 	"embed"
 	"io"
+	"strings"
 	"text/template"
 
 	"github.com/gomarkdown/markdown"
@@ -30,6 +31,9 @@ func (ps *Post) mdToHtml() {
 
 	ps.Body = string(markdown.Render(doc, renderer))
 }
+func (p Post) SanitisedTitle() string {
+	return strings.ToLower(strings.Replace(p.Title, " ", "-", -1))
+}
 
 var (
 	//go:embed "templates/*"
@@ -52,6 +56,20 @@ func NewPostRenderer() (*PostRenderer, error) {
 func (r *PostRenderer) Convert(w io.Writer, p Post) error {
 	p.mdToHtml() // TODO: errors? mock tests??
 	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", p); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *PostRenderer) RenderIndex(w io.Writer, posts []Post) error {
+	indexTemplate :=  `<ol>{{range .}}<li><a href="/post/{{.SanitisedTitle}}">{{.Title}}</a></li>{{end}}</ol>`
+	template, err := template.New("index").Parse(indexTemplate)
+	if err != nil {
+		return err
+	}
+
+	if err := template.Execute(w, posts); err != nil {
 		return err
 	}
 
