@@ -63,13 +63,7 @@ func (r *PostRenderer) Convert(w io.Writer, p Post) error {
 }
 
 func (r *PostRenderer) RenderIndex(w io.Writer, posts []Post) error {
-	indexTemplate :=  `<ol>{{range .}}<li><a href="/post/{{.SanitisedTitle}}">{{.Title}}</a></li>{{end}}</ol>`
-	template, err := template.New("index").Parse(indexTemplate)
-	if err != nil {
-		return err
-	}
-
-	if err := template.Execute(w, posts); err != nil {
+	if err := r.templ.ExecuteTemplate(w, "index.gohtml", posts); err != nil {
 		return err
 	}
 

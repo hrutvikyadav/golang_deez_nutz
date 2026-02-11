@@ -48,12 +48,8 @@ lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ipsum dolor emmet lorem ip
 			t.Error(err)
 		}
 
-		want := `<ol><li><a href="/post/blog1">blog1</a></li><li><a href="/post/blog2">blog2</a></li><li><a href="/post/blog-4">Blog 4</a></li></ol>`
-		got := buf.String()
-
-		if got != want {
-			t.Errorf("got %q want %q", got, want)
-		}
+		approvals.UseReporter(reporters.NewSystemoutReporter())
+		approvals.VerifyString(t, buf.String())
 
 	})
 }
