@@ -1,6 +1,9 @@
 package generics_test
 
-import "testing"
+import (
+	"testing"
+	genericz "github.com/hrutvikyadav/generics"
+)
 
 func TestAssertFunctions(t *testing.T) {
 	t.Run("asserting on integers", func(t *testing.T) {
@@ -16,7 +19,7 @@ func TestAssertFunctions(t *testing.T) {
 
 func AssertEqual[T comparable](t *testing.T, got, want T) {
 	//NOTE:     [T any] is not really useful -- not the same as interface{} because the label applies to all params --
-	//					is just says we can pass any type but is has to be the same T for all params i.e. everywhere label T occurs
+	//					is just says we can pass any type but is has to be the same T for all params i.e. everywhere label T occurs.
 	t.Helper()
 	if got != want {
 		t.Errorf("got %+v, want %+v", got, want)
@@ -28,4 +31,58 @@ func AssertNotEqual[T comparable](t *testing.T, got, want T) {
 	if got == want {
 		t.Errorf("didn't want %+v", got)
 	}
+}
+
+func AssertTrue(t *testing.T, got bool) {
+	t.Helper()
+	if !got {
+		t.Errorf("got %v, want true", got)
+	}
+}
+
+func AssertFalse(t *testing.T, got bool) {
+	t.Helper()
+	if got {
+		t.Errorf("got %v, want false", got)
+	}
+}
+
+func TestStack(t *testing.T) {
+	t.Run("integer stack", func(t *testing.T) {
+		myStackOfInts := new(genericz.StackOfInts)
+
+		// check stack is empty
+		AssertTrue(t, myStackOfInts.IsEmpty())
+
+		// add a thing, then check it's not empty
+		myStackOfInts.Push(123)
+		AssertFalse(t, myStackOfInts.IsEmpty())
+
+		// add another thing, pop it back again
+		myStackOfInts.Push(456)
+		value, _ := myStackOfInts.Pop()
+		AssertEqual(t, value, 456)
+		value, _ = myStackOfInts.Pop()
+		AssertEqual(t, value, 123)
+		AssertTrue(t, myStackOfInts.IsEmpty())
+	})
+
+	t.Run("string stack", func(t *testing.T) {
+		myStackOfStrings := new(genericz.StackOfStrings)
+
+		// check stack is empty
+		AssertTrue(t, myStackOfStrings.IsEmpty())
+
+		// add a thing, then check it's not empty
+		myStackOfStrings.Push("123")
+		AssertFalse(t, myStackOfStrings.IsEmpty())
+
+		// add another thing, pop it back again
+		myStackOfStrings.Push("456")
+		value, _ := myStackOfStrings.Pop()
+		AssertEqual(t, value, "456")
+		value, _ = myStackOfStrings.Pop()
+		AssertEqual(t, value, "123")
+		AssertTrue(t, myStackOfStrings.IsEmpty())
+	})
 }
