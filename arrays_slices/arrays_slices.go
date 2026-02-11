@@ -2,22 +2,35 @@ package main
 
 type Transaction struct {
 	From string
-	To string
-	Sum float64
+	To   string
+	Sum  float64
 }
 
-func BalanceFor(ts []Transaction, customer string) float64 {
-	calcBal := func(acc float64, t Transaction) float64 {
-		if t.From == customer {
-			return acc - t.Sum
-		}
-		if (t.To == customer) {
-			return acc + t.Sum
-		}
-		return acc
+func NewTransaction(from, to Account, sum float64) Transaction {
+	return Transaction{From: from.Name, To: to.Name, Sum: sum}
+}
+
+type Account struct {
+	Name    string
+	Balance float64
+}
+
+func NewBalanceFor(account Account, transactions []Transaction) Account {
+	return Reduce(
+		transactions,
+		applyTransaction,
+		account,
+	)
+}
+
+func applyTransaction(a Account, transaction Transaction) Account {
+	if transaction.From == a.Name {
+		a.Balance -= transaction.Sum
 	}
-	bal := Reduce(ts, calcBal, 0.0)
-	return bal
+	if transaction.To == a.Name {
+		a.Balance += transaction.Sum
+	}
+	return a
 }
 
 func Sum(nums []int) (int) {
