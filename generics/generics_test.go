@@ -14,14 +14,16 @@ func TestAssertFunctions(t *testing.T) {
 	})
 }
 
-func AssertEqual(t *testing.T, got, want interface{}) {// WARN: bad
+func AssertEqual[T comparable](t *testing.T, got, want T) {
+	//NOTE:     [T any] is not really useful -- not the same as interface{} because the label applies to all params --
+	//					is just says we can pass any type but is has to be the same T for all params i.e. everywhere label T occurs
 	t.Helper()
 	if got != want {
 		t.Errorf("got %+v, want %+v", got, want)
 	}
 }
 
-func AssertNotEqual(t *testing.T, got, want interface{}) {// WARN: bad
+func AssertNotEqual[T comparable](t *testing.T, got, want T) {
 	t.Helper()
 	if got == want {
 		t.Errorf("didn't want %+v", got)
