@@ -8,8 +8,10 @@ import (
 )
 
 func main() {
-	handler := http.HandlerFunc(httpserver.Handler)
-	if err := http.ListenAndServe(":8080", handler); err != nil {
+	http.HandleFunc("/greet", httpserver.GreetHandler)
+	http.HandleFunc("/curse", httpserver.CurseHandler)
+	// TODO: use NewServeMux instead of the Default
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
 }
