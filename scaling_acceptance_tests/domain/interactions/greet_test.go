@@ -5,6 +5,8 @@ package interactions_test
 
 import (
 	"testing"
+
+	"github.com/alecthomas/assert/v2"
     "github.com/hrutvikyadav/go-specs-greet/domain/interactions"
     "github.com/hrutvikyadav/go-specs-greet/specifications"
 )
@@ -17,4 +19,11 @@ func TestGreet(t *testing.T) {
 	// we will wrap our function in an adapter so that it satisfies the interface
 	// specifications.GreetSpecification(t, go_specs_greet.Greet)
 	specifications.GreetSpecification(t, specifications.GreetAdapter(interactions.Greet))
+
+	t.Run("should default name to World", func(t *testing.T) {
+		got := interactions.Greet("")
+		want := "Hello, World"
+
+		assert.Equal(t, want, got)
+	})
 }
