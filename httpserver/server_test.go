@@ -10,32 +10,36 @@ import (
 
 func TestGETPlayer(t *testing.T) {
 	t.Run("should return scores of player", func(t *testing.T) {
-		request, err := http.NewRequest(http.MethodGet, "/players/Oggy", nil)
-		if err != nil { t.Fatal(err) }
+		request := newGetScoreReq(t, "Oggy")
 		response := httptest.NewRecorder()
 
 		go_httpserver.PlayerServer(response, request)
 
-		got := response.Body.String()
-		want := "69"
+		assertPlayerScore(t, response.Body.String(), "69")
 
-		if got != want {
-			t.Errorf("got %s want %s", got, want)
-		}
 	})
 
 	t.Run("should return scores of player2", func(t *testing.T) {
-		request, err := http.NewRequest(http.MethodGet, "/players/Cockroach", nil)
-		if err != nil { t.Fatal(err) }
+		request := newGetScoreReq(t, "Cockroach")
 		response := httptest.NewRecorder()
 
 		go_httpserver.PlayerServer(response, request)
 
-		got := response.Body.String()
-		want := "420"
-
-		if got != want {
-			t.Errorf("got %s want %s", got, want)
-		}
+		assertPlayerScore(t, response.Body.String(), "420")
 	})
+}
+
+func newGetScoreReq(t testing.TB, player string) *http.Request {
+	t.Helper()
+	request, err := http.NewRequest(http.MethodGet, "/players/" + player, nil)
+	if err != nil { t.Fatal(err) }
+	return request
+}
+
+func assertPlayerScore(t testing.TB, got, want string) {
+	t.Helper()
+
+	if got != want {
+		t.Errorf("got %s want %s", got, want)
+	}
 }
