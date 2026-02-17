@@ -8,13 +8,28 @@ import (
 	go_httpserver "github.com/hrutvikyadav/go-httpserver"
 )
 
+type StubPlayerStore struct {
+	scores map[string]int
+}
+
+func (sp StubPlayerStore) GetScore(name string) int {
+	return sp.scores[name]
+}
+
 func TestGETPlayer(t *testing.T) {
+	store := StubPlayerStore{map[string]int{
+		"Oggy": 69,
+		"Cockroach": 420,
+	}}
+	server := &go_httpserver.PlayerServer{&store}
+
 	t.Run("should return scores of player", func(t *testing.T) {
 		request := newGetScoreReq(t, "Oggy")
 		response := httptest.NewRecorder()
 
-		go_httpserver.PlayerServer(response, request)
+		server.ServeHTTP(response, request)
 
+		assertStatus(t, response.Code, http.StatusOK)
 		assertPlayerScore(t, response.Body.String(), "69")
 
 	})
@@ -23,9 +38,19 @@ func TestGETPlayer(t *testing.T) {
 		request := newGetScoreReq(t, "Cockroach")
 		response := httptest.NewRecorder()
 
-		go_httpserver.PlayerServer(response, request)
+		server.ServeHTTP(response, request)
 
+		assertStatus(t, response.Code, http.StatusOK)
 		assertPlayerScore(t, response.Body.String(), "420")
+	})
+
+	t.Run("returns 404 on missing players", func(t *testing.T) {
+		request := newGetScoreReq(t, "Apollo")
+		response := httptest.NewRecorder()
+
+		server.ServeHTTP(response, request)
+
+		assertStatus(t, response.Code, http.StatusNotFound)
 	})
 }
 
@@ -41,5 +66,12 @@ func assertPlayerScore(t testing.TB, got, want string) {
 
 	if got != want {
 		t.Errorf("got %s want %s", got, want)
+	}
+}
+
+func assertStatus(t testing.TB, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("did not get correct status, got %d, want %d", got, want)
 	}
 }

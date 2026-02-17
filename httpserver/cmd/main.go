@@ -7,7 +7,13 @@ import (
 	go_httpserver "github.com/hrutvikyadav/go-httpserver"
 )
 
+type InMemoryStore struct {}
+
+func (ims *InMemoryStore) GetScore(name string) int {
+	return 69420
+}
+
 func main () {
-	handler := http.HandlerFunc(go_httpserver.PlayerServer)
-	log.Fatal(http.ListenAndServe(":8099", handler))
+	server := &go_httpserver.PlayerServer{&InMemoryStore{}}
+	log.Fatal(http.ListenAndServe(":8099", server))
 }
