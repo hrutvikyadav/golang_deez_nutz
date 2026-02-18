@@ -13,14 +13,19 @@ type PlayerStore interface {
 
 type PlayerServer struct {
 	Store PlayerStore
-	router *http.ServeMux
+	http.Handler // PlayerServer now exposes all apis of this embedding
 }
 
 func NewPlayerServer(store PlayerStore) *PlayerServer {
-	p := &PlayerServer{store, http.NewServeMux()}
+	p := new(PlayerServer)
 
-	p.router.Handle("/players/", http.HandlerFunc(p.playersHandler))
-	p.router.Handle("/league", http.HandlerFunc(p.leagueHandler))
+	p.Store = store
+
+	router := http.NewServeMux()
+	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
+
+	p.Handler = router
 
 	return p
 }
@@ -37,10 +42,6 @@ func (p *PlayerServer) playersHandler (w http.ResponseWriter, r *http.Request) {
 
 func (p *PlayerServer) leagueHandler (w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-}
-
-func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p.router.ServeHTTP(w, r)
 }
 
 func (p *PlayerServer) processGet(w http.ResponseWriter, player string) {
