@@ -7,13 +7,21 @@ import (
 	go_httpserver "github.com/hrutvikyadav/go-httpserver"
 )
 
-type InMemoryStore struct {}
-
-func (ims *InMemoryStore) GetScore(name string) int {
-	return 69420
+type InMemoryStore struct {
+	scores map[string]int
 }
 
-func (ims *InMemoryStore) PostWin(name string) {}
+func NewInMemoryStore() *InMemoryStore {
+	return &InMemoryStore{make(map[string]int)}
+}
+
+func (ims *InMemoryStore) GetScore(name string) int {
+	return ims.scores[name]
+}
+
+func (ims *InMemoryStore) PostWin(name string) {
+	ims.scores[name]++ // adding entry to nil map? solve by constructor
+}
 
 func main () {
 	server := &go_httpserver.PlayerServer{&InMemoryStore{}}
