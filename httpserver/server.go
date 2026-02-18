@@ -49,7 +49,9 @@ func (p *PlayerServer) playersHandler (w http.ResponseWriter, r *http.Request) {
 
 func (p *PlayerServer) leagueHandler (w http.ResponseWriter, r *http.Request) {
 	lTable := p.Store.GetLeague()
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&lTable)
+	// WARN: does not work w.Header().Set("content-type", "application/json")
 
 	w.WriteHeader(http.StatusOK)
 }
