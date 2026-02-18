@@ -68,13 +68,17 @@ func TestPOSTWins(t *testing.T) {
 	server := &go_httpserver.PlayerServer{&store}
 
 	t.Run("records Wins in store on POST/players/name", func(t *testing.T) {
-		request := newPostWinReq(t, "Bheem")
+		const PLAYAH = "Bheem"
+		request := newPostWinReq(t, PLAYAH)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 
 		assertStatus(t, response.Code, http.StatusAccepted)
 		if len(store.winCalls) != 1 {
 			t.Errorf("expected Postwin to be called %d times but was called %d times", 1, len( store.winCalls ))
+		}
+		if store.winCalls[0] != PLAYAH {
+			t.Errorf("expected to invoke store with %s got %s instead", PLAYAH, store.winCalls[0])
 		}
 	})
 }
