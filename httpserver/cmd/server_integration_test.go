@@ -12,7 +12,7 @@ import (
 func TestServerStoreIntegration(t *testing.T) {
 	const PLAYER = "Ben10"
 	store := NewInMemoryStore()
-	server := &go_httpserver.PlayerServer{store}
+	server := go_httpserver.NewPlayerServer(store)
 
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinReq(t, PLAYER))
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinReq(t, PLAYER))
