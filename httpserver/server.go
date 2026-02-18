@@ -1,10 +1,16 @@
 package go_httpserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 )
+
+type Player struct {
+	Name string
+	Score int
+}
 
 type PlayerStore interface {
 	GetScore(name string) int
@@ -41,6 +47,13 @@ func (p *PlayerServer) playersHandler (w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) leagueHandler (w http.ResponseWriter, r *http.Request) {
+	lTable := []Player{
+		{"Chris", 20 },
+		{"Bumstead", 22 },
+	}
+
+	json.NewEncoder(w).Encode(&lTable)
+
 	w.WriteHeader(http.StatusOK)
 }
 

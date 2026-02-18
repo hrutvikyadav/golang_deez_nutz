@@ -1,6 +1,7 @@
 package go_httpserver_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -92,6 +93,12 @@ func TestGetLeague(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
+
+		var got []go_httpserver.Player
+		err := json.NewDecoder(response.Body).Decode(&got)
+		if err != nil {
+			t.Fatalf("unable to parse response %q into Player slice, %v", response.Body, err)
+		}
 
 		assertStatus(t, response.Code, http.StatusOK)
 	})
