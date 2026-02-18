@@ -16,16 +16,16 @@ type PlayerServer struct {
 }
 
 func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	player := strings.TrimPrefix(r.URL.Path, "/players/")
 	switch r.Method {
 	case http.MethodPost:
-		p.processPost(w, r)
+		p.processPost(w, player)
 	case http.MethodGet:
-		p.processGet(w, r)
+		p.processGet(w, player)
 	}
 }
 
-func (p *PlayerServer) processGet(w http.ResponseWriter, r *http.Request) {
-	player := strings.TrimPrefix(r.URL.Path, "/players/")
+func (p *PlayerServer) processGet(w http.ResponseWriter, player string) {
 	score := p.Store.GetScore(player)
 
 	if score == 0 {
@@ -35,8 +35,7 @@ func (p *PlayerServer) processGet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, score)
 }
 
-func (p *PlayerServer) processPost(w http.ResponseWriter, r *http.Request) {
-	player := strings.TrimPrefix(r.URL.Path, "/players/")
+func (p *PlayerServer) processPost(w http.ResponseWriter, player string) {
 	p.Store.PostWin(player)
 	w.WriteHeader(http.StatusAccepted)
 }
