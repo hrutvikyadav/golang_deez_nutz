@@ -1,5 +1,7 @@
 package main
 
+import go_httpserver "github.com/hrutvikyadav/go-httpserver"
+
 type InMemoryStore struct {
 	// the store will be accessed by http handlers.
 	// in go for each request, new goroutine is spinned up
@@ -20,3 +22,6 @@ func (ims *InMemoryStore) PostWin(name string) {
 	ims.scores[name]++ // adding entry to nil map? solve by constructor
 }
 
+func (ims *InMemoryStore) GetLeague() []go_httpserver.Player{
+	return nil
+}
