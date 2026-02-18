@@ -10,17 +10,23 @@ import (
 
 type StubPlayerStore struct {
 	scores map[string]int
+	winCalls []string
 }
 
 func (sp StubPlayerStore) GetScore(name string) int {
 	return sp.scores[name]
 }
 
+func (sp *StubPlayerStore) PostWin(name string) {
+	sp.winCalls = append(sp.winCalls, name)
+}
+
+
 func TestGETPlayer(t *testing.T) {
-	store := StubPlayerStore{map[string]int{
-		"Oggy": 69,
-		"Cockroach": 420,
-	}}
+	store := StubPlayerStore{
+		map[string]int{ "Oggy": 69, "Cockroach": 420, },
+		[]string{},
+	}
 	server := &go_httpserver.PlayerServer{&store}
 
 	t.Run("should return scores of player", func(t *testing.T) {
@@ -55,21 +61,21 @@ func TestGETPlayer(t *testing.T) {
 }
 
 func TestPOSTWins(t *testing.T) {
-	store := StubPlayerStore{map[string]int{
-	}}
+	store := StubPlayerStore{
+		scores:   map[string]int{},
+		winCalls: nil,
+	}
 	server := &go_httpserver.PlayerServer{&store}
 
-	t.Run("returns accepted on POST/players/name", func(t *testing.T) {
-		request, err := http.NewRequest(http.MethodPost, "/players/Bheem", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	t.Run("records Wins in store on POST/players/name", func(t *testing.T) {
+		request := newPostWinReq(t, "Bheem")
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 
-		got := response.Code
-		want := http.StatusAccepted
-		assertStatus(t, got, want)
+		assertStatus(t, response.Code, http.StatusAccepted)
+		if len(store.winCalls) != 1 {
+			t.Errorf("expected Postwin to be called %d times but was called %d times", 1, len( store.winCalls ))
+		}
 	})
 }
 
@@ -77,6 +83,14 @@ func newGetScoreReq(t testing.TB, player string) *http.Request {
 	t.Helper()
 	request, err := http.NewRequest(http.MethodGet, "/players/" + player, nil)
 	if err != nil { t.Fatal(err) }
+	return request
+}
+
+func newPostWinReq(t testing.TB, player string) (*http.Request) {
+	request, err := http.NewRequest(http.MethodPost, "/players/" + player, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return request
 }
 
