@@ -14,9 +14,11 @@ type PlayerServer struct {
 	Store PlayerStore
 }
 
-// Instead of a simple function wrapped in HandlerFunc decorator,
-// we now have an actual struct that implement the Handler interface
 func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		w.WriteHeader(http.StatusAccepted)
+	}
+
 	player := strings.TrimPrefix(r.URL.Path, "/players/")
 	score := p.Store.GetScore(player)
 

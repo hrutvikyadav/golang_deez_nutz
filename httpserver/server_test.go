@@ -54,6 +54,25 @@ func TestGETPlayer(t *testing.T) {
 	})
 }
 
+func TestPOSTWins(t *testing.T) {
+	store := StubPlayerStore{map[string]int{
+	}}
+	server := &go_httpserver.PlayerServer{&store}
+
+	t.Run("returns accepted on POST/players/name", func(t *testing.T) {
+		request, err := http.NewRequest(http.MethodPost, "/players/Bheem", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+
+		got := response.Code
+		want := http.StatusAccepted
+		assertStatus(t, got, want)
+	})
+}
+
 func newGetScoreReq(t testing.TB, player string) *http.Request {
 	t.Helper()
 	request, err := http.NewRequest(http.MethodGet, "/players/" + player, nil)
