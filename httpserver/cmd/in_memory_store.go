@@ -23,5 +23,9 @@ func (ims *InMemoryStore) PostWin(name string) {
 }
 
 func (ims *InMemoryStore) GetLeague() []go_httpserver.Player{
-	return nil
+	league := []go_httpserver.Player{}
+	for name, score := range ims.scores {
+		league = append(league, go_httpserver.Player{name, score})
+	}
+	return league
 }

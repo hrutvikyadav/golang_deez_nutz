@@ -1,9 +1,12 @@
 package main
 
 import (
-	"testing"
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
+	"testing"
 
 	go_httpserver "github.com/hrutvikyadav/go-httpserver"
 )
@@ -18,11 +21,25 @@ func TestServerStoreIntegration(t *testing.T) {
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinReq(t, PLAYER))
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinReq(t, PLAYER))
 
-	response := httptest.NewRecorder()
-	server.ServeHTTP(response, newGetScoreReq(t, PLAYER))
+	t.Run("Get posted score", func(t *testing.T) {
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, newGetScoreReq(t, PLAYER))
 
-	assertStatus(t, response.Code, http.StatusOK)
-	assertPlayerScore(t, response.Body.String(), "3")
+		assertStatus(t, response.Code, http.StatusOK)
+		assertPlayerScore(t, response.Body.String(), "3")
+	})
+
+	t.Run("get league", func(t *testing.T) {
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, getLeagueReq())
+		assertStatus(t, response.Code, http.StatusOK)
+
+		got := getLeagueFromResponse(t, response.Body)
+		want := []go_httpserver.Player{
+			{PLAYER, 3},
+		}
+		assertLeagues(t, got, want)
+	})
 
 }
 
@@ -54,4 +71,27 @@ func assertStatus(t testing.TB, got, want int) {
 	if got != want {
 		t.Errorf("did not get correct status, got %d, want %d", got, want)
 	}
+}
+
+func getLeagueFromResponse(t testing.TB, body io.Reader) []go_httpserver.Player {
+	t.Helper()
+	var got []go_httpserver.Player
+	err := json.NewDecoder(body).Decode(&got)
+	if err != nil {
+		t.Fatalf("unable to parse response %q into Player slice, %v", body, err)
+	}
+
+	return got
+}
+
+func assertLeagues(t testing.TB, got, want []go_httpserver.Player) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func getLeagueReq() *http.Request {
+	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
+	return req
 }
